@@ -1,12 +1,11 @@
 package telas;
 
 import javax.swing.*;
+import java.awt.*;
 import modelo.*;
 import relatorios.RelatorioPdf;
-import java.awt.*;
 
 public class MenuPrincipal extends JFrame {
-
 	public MenuPrincipal(Funcionario funcionario) {
 		configurarJanela(funcionario);
 		adicionarComponentes(funcionario);
@@ -14,70 +13,109 @@ public class MenuPrincipal extends JFrame {
 	}
 
 	private void configurarJanela(Funcionario funcionario) {
-		setTitle("Menu - " + funcionario.getNome() + " (" + funcionario.getTipo() + ")");
-		setSize(350, 400);
+		setTitle("Menu Principal - " + funcionario.getNome() + " (" + funcionario.getTipo() + ")");
+		setSize(400, 500);
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		setLayout(new BoxLayout(getContentPane(), BoxLayout.Y_AXIS));
 		setLocationRelativeTo(null);
 	}
 
 	private void adicionarComponentes(Funcionario funcionario) {
-		// Botões comuns a todos
-		adicionarBotao("Consultar Obras", () -> new TelaConsultaObras());
+		// Painel principal com borda
+		JPanel painelPrincipal = new JPanel();
+		painelPrincipal.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
+		painelPrincipal.setLayout(new BoxLayout(painelPrincipal, BoxLayout.Y_AXIS));
 
-		// Botões por tipo de funcionário
+		// Cabeçalho
+		JLabel lblTitulo = new JLabel("Menu Principal");
+		lblTitulo.setFont(new Font("Arial", Font.BOLD, 18));
+		lblTitulo.setAlignmentX(Component.CENTER_ALIGNMENT);
+		painelPrincipal.add(lblTitulo);
+
+		JLabel lblUsuario = new JLabel("Usuário: " + funcionario.getNome());
+		lblUsuario.setAlignmentX(Component.CENTER_ALIGNMENT);
+		painelPrincipal.add(lblUsuario);
+
+		JLabel lblTipo = new JLabel("Perfil: " + funcionario.getTipo());
+		lblTipo.setAlignmentX(Component.CENTER_ALIGNMENT);
+		painelPrincipal.add(lblTipo);
+
+		painelPrincipal.add(Box.createRigidArea(new Dimension(0, 20)));
+
+		// Painel de botões
+		JPanel painelBotoes = new JPanel();
+		painelBotoes.setLayout(new GridLayout(0, 1, 5, 5));
+
+		adicionarBotaoMenu(painelBotoes, "Consultar Obras", () -> new TelaConsultaObras());
+
+// Botões por tipo de funcionário
 		switch (funcionario.getTipo()) {
 		case ADMINISTRADOR:
-			adicionarBotao("Cadastrar Funcionário", () -> new CadastroFuncionario());
-			adicionarBotao("Cadastrar Usuário", () -> new TelaUsuario());
-			adicionarBotao("Cadastrar Obra", () -> new TelaObra());
-			adicionarBotao("Registrar Empréstimo", () -> new TelaEmprestimo());
-			adicionarBotao("Registrar Devolução", () -> new TelaDevolucao());
-			adicionarBotao("Pagamento de Multas", () -> new TelaPagamento());
-			adicionarBotao("Gerar Relatórios", this::exibirMenuRelatorios);
+			adicionarBotaoMenu(painelBotoes, "Cadastrar Funcionário", () -> new CadastroFuncionario());
+			adicionarBotaoMenu(painelBotoes, "Cadastrar Usuário", () -> new TelaUsuario());
+			adicionarBotaoMenu(painelBotoes, "Cadastrar Obra", () -> new TelaObra());
+			adicionarBotaoMenu(painelBotoes, "Registrar Empréstimo", () -> new TelaEmprestimo());
+			adicionarBotaoMenu(painelBotoes, "Registrar Devolução", () -> new TelaDevolucao());
+			adicionarBotaoMenu(painelBotoes, "Pagamento de Multas", () -> new TelaPagamento());
+			adicionarBotaoMenu(painelBotoes, "Gerar Relatórios", this::exibirMenuRelatorios);
 			break;
 
 		case BIBLIOTECARIO:
-			adicionarBotao("Cadastrar Usuário", () -> new TelaUsuario());
-			adicionarBotao("Cadastrar Obra", () -> new TelaObra());
-			adicionarBotao("Registrar Empréstimo", () -> new TelaEmprestimo());
-			adicionarBotao("Registrar Devolução", () -> new TelaDevolucao());
-			adicionarBotao("Pagamento de Multas", () -> new TelaPagamento());
-			adicionarBotao("Gerar Relatórios", this::exibirMenuRelatorios);
+			adicionarBotaoMenu(painelBotoes, "Cadastrar Usuário", () -> new TelaUsuario());
+			adicionarBotaoMenu(painelBotoes, "Cadastrar Obra", () -> new TelaObra());
+			adicionarBotaoMenu(painelBotoes, "Registrar Empréstimo", () -> new TelaEmprestimo());
+			adicionarBotaoMenu(painelBotoes, "Registrar Devolução", () -> new TelaDevolucao());
+			adicionarBotaoMenu(painelBotoes, "Pagamento de Multas", () -> new TelaPagamento());
+			adicionarBotaoMenu(painelBotoes, "Gerar Relatórios", this::exibirMenuRelatorios);
 			break;
 
 		case ESTAGIARIO:
-			adicionarBotao("Registrar Devolução", () -> new TelaDevolucao());
+			adicionarBotaoMenu(painelBotoes, "Registrar Devolução", () -> new TelaDevolucao());
 			break;
 		}
+
+		painelPrincipal.add(painelBotoes);
+		add(painelPrincipal);
+	}
+
+	private void adicionarBotaoMenu(JPanel painel, String texto, Runnable acao) {
+		JButton btn = new JButton(texto);
+		btn.setAlignmentX(Component.CENTER_ALIGNMENT);
+		btn.setMaximumSize(new Dimension(Integer.MAX_VALUE, btn.getMinimumSize().height));
+		btn.addActionListener(e -> acao.run());
+		painel.add(btn);
 	}
 
 	private void exibirMenuRelatorios() {
 		JDialog dialog = new JDialog(this, "Gerar Relatórios", true);
 		dialog.setSize(300, 200);
-		dialog.setLayout(new GridLayout(3, 1, 10, 10));
-
-		adicionarBotaoRelatorio(dialog, "Empréstimos do Mês", RelatorioPdf::gerarRelatorioEmprestimosDoMes);
-		adicionarBotaoRelatorio(dialog, "Obras Mais Emprestadas", RelatorioPdf::gerarRelatorioObrasMaisEmprestadas);
-		adicionarBotaoRelatorio(dialog, "Usuários com Atrasos", RelatorioPdf::gerarRelatorioUsuariosComMaisAtrasos);
-
+		dialog.setLayout(new GridLayout(0, 1, 10, 10));
 		dialog.setLocationRelativeTo(this);
+
+		JPanel painel = new JPanel();
+		painel.setBorder(BorderFactory.createEmptyBorder(15, 15, 15, 15));
+		painel.setLayout(new BoxLayout(painel, BoxLayout.Y_AXIS));
+
+		JLabel titulo = new JLabel("Selecione o Relatório");
+		titulo.setAlignmentX(Component.CENTER_ALIGNMENT);
+		painel.add(titulo);
+		painel.add(Box.createRigidArea(new Dimension(0, 15)));
+
+		adicionarBotaoRelatorio(painel, "Empréstimos do Mês", RelatorioPdf::gerarRelatorioEmprestimosDoMes);
+		adicionarBotaoRelatorio(painel, "Obras Mais Emprestadas", RelatorioPdf::gerarRelatorioObrasMaisEmprestadas);
+		adicionarBotaoRelatorio(painel, "Usuários com Atrasos", RelatorioPdf::gerarRelatorioUsuariosComMaisAtrasos);
+
+		dialog.add(painel);
 		dialog.setVisible(true);
 	}
 
-	private void adicionarBotao(String texto, Runnable acao) {
+	private void adicionarBotaoRelatorio(JPanel painel, String texto, Runnable acao) {
 		JButton btn = new JButton(texto);
 		btn.setAlignmentX(Component.CENTER_ALIGNMENT);
-		btn.addActionListener(e -> acao.run());
-		add(btn);
-	}
-
-	private void adicionarBotaoRelatorio(JDialog dialog, String texto, Runnable acao) {
-		JButton btn = new JButton(texto);
 		btn.addActionListener(e -> {
 			acao.run();
-			dialog.dispose();
+			((JDialog) btn.getTopLevelAncestor()).dispose();
 		});
-		dialog.add(btn);
+		painel.add(btn);
+		painel.add(Box.createRigidArea(new Dimension(0, 5)));
 	}
 }

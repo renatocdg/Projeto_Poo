@@ -1,51 +1,90 @@
 package telas;
 
 import javax.swing.*;
+import java.awt.*;
 import modelo.*;
 import dao.FuncionarioDao;
 
 public class TelaLogin extends JFrame {
-	private JTextField campoLogin = new JTextField(15);
-	private JPasswordField campoSenha = new JPasswordField(15);
-	private JComboBox<TFuncionario> comboTipo = new JComboBox<>(TFuncionario.values());
+    private JTextField campoLogin = new JTextField(15);
+    private JPasswordField campoSenha = new JPasswordField(15);
+    private JComboBox<TFuncionario> comboTipo = new JComboBox<>(TFuncionario.values());
 
-	public TelaLogin() {
-		
-		setTitle("Login");
-		setSize(300, 200);
-		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		setLayout(new BoxLayout(getContentPane(), BoxLayout.Y_AXIS));
+    public TelaLogin() {
+        setTitle("Login - Sistema Biblioteca");
+        setSize(350, 300);
+        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        setLocationRelativeTo(null);
+        
+        // Painel principal com borda e padding
+        JPanel painelPrincipal = new JPanel();
+        painelPrincipal.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
+        painelPrincipal.setLayout(new BoxLayout(painelPrincipal, BoxLayout.Y_AXIS));
+        
+        // Título
+        JLabel titulo = new JLabel("Acesso ao Sistema");
+        titulo.setFont(new Font("Arial", Font.BOLD, 18));
+        titulo.setAlignmentX(Component.CENTER_ALIGNMENT);
+        painelPrincipal.add(titulo);
+        painelPrincipal.add(Box.createRigidArea(new Dimension(0, 20)));
+        
+        // Campos do formulário
+        JPanel painelCampos = new JPanel();
+        painelCampos.setLayout(new GridLayout(0, 1, 5, 5));
+        
+        adicionarCampo(painelCampos, "Login:", campoLogin);
+        adicionarCampo(painelCampos, "Senha:", campoSenha);
+        
+        JPanel painelTipo = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        painelTipo.add(new JLabel("Tipo:"));
+        painelTipo.add(comboTipo);
+        painelCampos.add(painelTipo);
+        
+        painelPrincipal.add(painelCampos);
+        painelPrincipal.add(Box.createRigidArea(new Dimension(0, 20)));
+        
 
-		add(new JLabel("Login:"));
-		add(campoLogin);
-		add(new JLabel("Senha:"));
-		add(campoSenha);
-		add(new JLabel("Tipo:"));
-		add(comboTipo);
+        JButton btnEntrar = new JButton("Entrar");
+        btnEntrar.setAlignmentX(Component.CENTER_ALIGNMENT);
+        btnEntrar.setPreferredSize(new Dimension(100, 30));
+        btnEntrar.addActionListener(e -> autenticar());
+        
+        painelPrincipal.add(btnEntrar);
+        
+        add(painelPrincipal);
+        setVisible(true);
+    }
 
-		JButton btnEntrar = new JButton("Entrar");
-		btnEntrar.addActionListener(e -> autenticar());
-		add(btnEntrar);
+    private void adicionarCampo(JPanel painel, String label, JComponent campo) {
+        JPanel painelCampo = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        painelCampo.add(new JLabel(label));
+        campo.setPreferredSize(new Dimension(200, 25));
+        painelCampo.add(campo);
+        painel.add(painelCampo);
+    }
 
-		setLocationRelativeTo(null);
-		setVisible(true);
-	}
+    private void autenticar() {
+        String login = campoLogin.getText();
+        String senha = new String(campoSenha.getPassword());
+        TFuncionario tipo = (TFuncionario) comboTipo.getSelectedItem();
 
-	private void autenticar() {
-		String login = campoLogin.getText();
-		String senha = new String(campoSenha.getPassword());
-		TFuncionario tipo = (TFuncionario) comboTipo.getSelectedItem();
+        Funcionario funcionario = FuncionarioDao.autenticar(login, senha, tipo);
+        if (funcionario != null) {
+            new MenuPrincipal(funcionario);
+            dispose();
+        } else {
+            JOptionPane.showMessageDialog(this, "Login ou senha incorretos!", "Erro de Autenticação", JOptionPane.ERROR_MESSAGE);
+        }
+    }
 
-		Funcionario funcionario = FuncionarioDao.autenticar(login, senha, tipo);
-		if (funcionario != null) {
-			new MenuPrincipal(funcionario);
-			dispose();
-		} else {
-			JOptionPane.showMessageDialog(this, "Login ou senha incorretos!");
-		}
-	}
-
-	public static void main(String[] args) {
-		new TelaLogin();
-	}
+    public static void main(String[] args) {
+        SwingUtilities.invokeLater(() -> {
+            try {
+                UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+            new TelaLogin();
+        });
+    }
 }

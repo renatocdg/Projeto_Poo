@@ -15,32 +15,43 @@ public class Usuario {
 		this.email = email;
 	}
 
-// Getters
+// Getters e Setters
 	public String getMatricula() {
 		return matricula;
+	}
+
+	public void setMatricula(String matricula) {
+		this.matricula = matricula;
 	}
 
 	public String getNome() {
 		return nome;
 	}
 
+	public void setNome(String nome) {
+		this.nome = nome;
+	}
+
 	public TipoUsuario getTipo() {
 		return tipo;
+	}
+
+	public void setTipo(TipoUsuario tipo) {
+		this.tipo = tipo;
 	}
 
 	public String getTelefone() {
 		return telefone;
 	}
 
-	public String getEmail() {
-		return email;
-	}
-
-// Setters
 	public void setTelefone(String telefone) {
 		if (telefone != null && !telefone.trim().isEmpty()) {
 			this.telefone = telefone;
 		}
+	}
+
+	public String getEmail() {
+		return email;
 	}
 
 	public void setEmail(String email) {
