@@ -27,7 +27,7 @@ public class EmprestimoDao {
 		});
 	}
 
-	// Método para limpar todos os empréstimos (útil para testes)
+	// Método para limpar todos os empréstimos
 	public static void limparDados() {
 		emprestimos.clear();
 		ultimoId = 0;

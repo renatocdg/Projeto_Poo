@@ -14,14 +14,17 @@ import dao.*;
 import modelo.*;
 
 public class RelatorioPdf {
+	
+	// Onde os relatórios irão ser salvos
 	private static final String PASTA_RELATORIOS = "relatorios/";
 
+	// Método irá configurar o cabeçalho padrão do documento PDF
 	private static void configurarDocumento(Document doc, String titulo) throws DocumentException {
 		doc.add(new Paragraph(titulo, FontFactory.getFont(FontFactory.HELVETICA_BOLD, 16)));
 		doc.add(new Paragraph("Gerado em: " + LocalDate.now().format(DateTimeFormatter.ofPattern("dd/MM/yyyy"))));
 		doc.add(Chunk.NEWLINE);
 	}
-
+	// Método exibe mensagem de sucesso após gerar o relatório
 	private static void mostrarSucesso(String caminho) {
 		String caminhoAbsoluto = new File(caminho).getAbsolutePath();
 		JOptionPane.showMessageDialog(null, "Relatório gerado com sucesso!\nSalvo em: " + caminhoAbsoluto, "Relatório",
@@ -68,7 +71,7 @@ public class RelatorioPdf {
 					JOptionPane.ERROR_MESSAGE);
 		}
 	}
-
+	// Método gera relatório das obras mais emprestadas
 	public static void gerarRelatorioObrasMaisEmprestadas() {
 		String nomeArquivo = "obras_mais_emprestadas_" + LocalDate.now().format(DateTimeFormatter.ofPattern("yyyyMMdd"))
 				+ ".pdf";
@@ -108,7 +111,7 @@ public class RelatorioPdf {
 					JOptionPane.ERROR_MESSAGE);
 		}
 	}
-
+	// Método gera relatório de usuários com mais atrasos na devolução
 	public static void gerarRelatorioUsuariosComMaisAtrasos() {
 		String nomeArquivo = "usuarios_atrasos_" + LocalDate.now().format(DateTimeFormatter.ofPattern("yyyyMMdd"))
 				+ ".pdf";

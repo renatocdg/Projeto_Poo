@@ -1,9 +1,10 @@
 package telas;
 
 import javax.swing.*;
-import controle.EmprestimoControle;
+import controle.*;
 
 public class TelaDevolucao extends JFrame {
+	
 	public TelaDevolucao() {
 		setTitle("Devolução de Obra");
 		setSize(300, 200);

@@ -115,6 +115,7 @@ public class TelaUsuario extends JFrame {
 			}
 			usuarios.add(new Usuario(matricula, nome, tipo, email, telefone));
 		} else {
+			
 			// Edição
 			usuarioSelecionado.setMatricula(matricula);
 			usuarioSelecionado.setNome(nome);

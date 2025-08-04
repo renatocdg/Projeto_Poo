@@ -3,9 +3,10 @@ package telas;
 import javax.swing.*;
 import java.awt.*;
 import modelo.*;
-import dao.FuncionarioDao;
+import dao.*;
 
 public class TelaLogin extends JFrame {
+	
     private JTextField campoLogin = new JTextField(15);
     private JPasswordField campoSenha = new JPasswordField(15);
     private JComboBox<TipoFuncionario> comboTipo = new JComboBox<>(TipoFuncionario.values());

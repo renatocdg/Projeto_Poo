@@ -10,6 +10,7 @@ import dao.*;
 import modelo.*;
 
 public class EmprestimoControle {
+	
 	private static List<Emprestimo> emprestimosAtivos = new ArrayList<>();
 	private static int ultimoId = 0;
 
@@ -19,6 +20,7 @@ public class EmprestimoControle {
 	}
 
 	public static void registrarEmprestimo(String matricula, String codigoStr) throws Exception {
+		
 		try {
 			// Validação dos dados de entrada
 			if (matricula == null || matricula.trim().isEmpty() || codigoStr == null || codigoStr.trim().isEmpty()) {
@@ -131,12 +133,11 @@ public class EmprestimoControle {
 	}
 
 	public static List<Emprestimo> getHistoricoCompleto() {
-		// Se quiser manter histórico mesmo após devolução
+		
 		return new ArrayList<>(emprestimosAtivos);
 	}
 
 	public static void limparDados() {
-		// Para testes
 		emprestimosAtivos.clear();
 		ultimoId = 0;
 	}

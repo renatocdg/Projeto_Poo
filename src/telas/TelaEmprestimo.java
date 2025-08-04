@@ -1,7 +1,7 @@
 package telas;
 
 import javax.swing.*;
-import controle.EmprestimoControle;
+import controle.*;
 
 public class TelaEmprestimo extends JFrame {
 	

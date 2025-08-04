@@ -79,8 +79,7 @@ public class ControleUsuario {
 
 	//Métodos de consulta
 	public Usuario buscarPorMatricula(String matricula) {
-		return listaUsuarios.stream().filter(u -> u.getMatricula().equalsIgnoreCase(matricula)).findFirst()
-				.orElse(null);
+		return listaUsuarios.stream().filter(u -> u.getMatricula().equalsIgnoreCase(matricula)).findFirst().orElse(null);
 	}
 
 	public List<Usuario> listarTodos() {

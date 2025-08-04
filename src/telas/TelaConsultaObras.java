@@ -28,6 +28,7 @@ public class TelaConsultaObras extends JFrame {
 
 	private void criarComponentes() {
 		modeloTabela = new DefaultTableModel(new Object[] { "Código", "Título", "Autor", "Ano", "Tipo", "Status" }, 0) {
+			
 			@Override
 			public boolean isCellEditable(int row, int column) {
 				return false;

@@ -79,7 +79,7 @@ public class ObraDao {
 
 	// Método auxiliar para debug
 	public static void imprimirObras() {
-		System.out.println("\n=== LISTA DE OBRAS ===");
+		System.out.println("LISTA DE OBRAS");
 		System.out.printf("%-5s | %-20s | %-10s | %-10s | %-10s%n", "Código", "Título", "Tipo", "Status", "Dias Empr.");
 
 		obras.forEach(o -> System.out.printf("%-5d | %-20s | %-10s | %-10s | %-10d%n", o.getCodigo(), o.getTitulo(),

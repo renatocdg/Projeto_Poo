@@ -9,6 +9,7 @@ import com.google.gson.reflect.TypeToken;
 import modelo.Multa;
 
 public class MultaDao {
+	
 	private static final String ARQUIVO = "multas.json";
 	
 	private static final Gson gson = new Gson();
