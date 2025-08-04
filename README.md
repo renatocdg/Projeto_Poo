@@ -3,13 +3,13 @@ PROJETO POO
 Dados dos Funcionarios para Login:
 
 ADMINISTRADOR: 
-admin 
-123
+Login: admin
+Senha: 123
 
 BIBLIOTECÁRIO:
-bibliotecario 
-123
+Login: bibliotecario 
+Senha: 123
 
 ESTAGIÁRIO: 
-estagiario 
-123
+Login: estagiario 
+Senha: 123
