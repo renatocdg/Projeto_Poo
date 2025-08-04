@@ -4,8 +4,10 @@ import javax.swing.*;
 import java.awt.*;
 import modelo.*;
 import relatorios.RelatorioPdf;
+import dao.FuncionarioDao;
 
 public class MenuPrincipal extends JFrame {
+	
 	public MenuPrincipal(Funcionario funcionario) {
 		configurarJanela(funcionario);
 		adicionarComponentes(funcionario);
@@ -20,7 +22,6 @@ public class MenuPrincipal extends JFrame {
 	}
 
 	private void adicionarComponentes(Funcionario funcionario) {
-		// Painel principal com borda
 		JPanel painelPrincipal = new JPanel();
 		painelPrincipal.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
 		painelPrincipal.setLayout(new BoxLayout(painelPrincipal, BoxLayout.Y_AXIS));
@@ -45,32 +46,26 @@ public class MenuPrincipal extends JFrame {
 		JPanel painelBotoes = new JPanel();
 		painelBotoes.setLayout(new GridLayout(0, 1, 5, 5));
 
+		// Botões comuns a todos
 		adicionarBotaoMenu(painelBotoes, "Consultar Obras", () -> new TelaConsultaObras());
 
-// Botões por tipo de funcionário
-		switch (funcionario.getTipo()) {
-		case ADMINISTRADOR:
-			adicionarBotaoMenu(painelBotoes, "Cadastrar Funcionário", () -> new CadastroFuncionario());
+		// Botões por tipo de funcionário
+		if (funcionario.getTipo() == TipoFuncionario.ADMINISTRADOR) {
 			adicionarBotaoMenu(painelBotoes, "Cadastrar Usuário", () -> new TelaUsuario());
 			adicionarBotaoMenu(painelBotoes, "Cadastrar Obra", () -> new TelaObra());
 			adicionarBotaoMenu(painelBotoes, "Registrar Empréstimo", () -> new TelaEmprestimo());
 			adicionarBotaoMenu(painelBotoes, "Registrar Devolução", () -> new TelaDevolucao());
 			adicionarBotaoMenu(painelBotoes, "Pagamento de Multas", () -> new TelaPagamento());
 			adicionarBotaoMenu(painelBotoes, "Gerar Relatórios", this::exibirMenuRelatorios);
-			break;
-
-		case BIBLIOTECARIO:
+		} else if (funcionario.getTipo() == TipoFuncionario.BIBLIOTECARIO) {
 			adicionarBotaoMenu(painelBotoes, "Cadastrar Usuário", () -> new TelaUsuario());
 			adicionarBotaoMenu(painelBotoes, "Cadastrar Obra", () -> new TelaObra());
 			adicionarBotaoMenu(painelBotoes, "Registrar Empréstimo", () -> new TelaEmprestimo());
 			adicionarBotaoMenu(painelBotoes, "Registrar Devolução", () -> new TelaDevolucao());
 			adicionarBotaoMenu(painelBotoes, "Pagamento de Multas", () -> new TelaPagamento());
 			adicionarBotaoMenu(painelBotoes, "Gerar Relatórios", this::exibirMenuRelatorios);
-			break;
-
-		case ESTAGIARIO:
+		} else if (funcionario.getTipo() == TipoFuncionario.ESTAGIARIO) {
 			adicionarBotaoMenu(painelBotoes, "Registrar Devolução", () -> new TelaDevolucao());
-			break;
 		}
 
 		painelPrincipal.add(painelBotoes);

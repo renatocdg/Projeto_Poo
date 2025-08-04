@@ -8,166 +8,230 @@ import java.awt.event.ActionEvent;
 import java.util.List;
 
 public class TelaObra extends JFrame {
-	
-	private JTextField campoCodigo, campoTitulo, campoAutor, campoAno;
-	private JComboBox<String> comboTipo;
-	private JComboBox<Obra> comboObras;
-	private JButton btnSalvar, btnExcluir;
-	private Obra obraSelecionada;
 
-	public TelaObra() {
-		setTitle("Gerenciamento de Obras");
-		setSize(400, 350);
-		setLayout(new GridLayout(7, 2, 10, 10));
-		setLocationRelativeTo(null);
-		setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+    private JTextField campoCodigo, campoTitulo, campoAutor, campoAno, campoTempoEmprestimo;
+    private JComboBox<String> comboTipo;
+    private JComboBox<Obra> comboObras;
+    private JButton btnSalvar, btnExcluir, btnLimpar, btnDebug;
+    private Obra obraSelecionada;
 
-		// Componentes
-		comboObras = new JComboBox<>();
-		campoCodigo = new JTextField();
-		campoTitulo = new JTextField();
-		campoAutor = new JTextField();
-		campoAno = new JTextField();
-		comboTipo = new JComboBox<>(new String[] { "Livro", "Revista", "Artigo" });
-		btnSalvar = new JButton("Salvar");
-		btnExcluir = new JButton("Excluir");
-		JButton btnNovo = new JButton("Novo");
+    public TelaObra() {
+        configurarJanela();
+        inicializarComponentes();
+        configurarLayout();
+        carregarObras();
+        adicionarListeners();
 
-		// Layout
-		add(new JLabel("Obra:"));
-		add(comboObras);
-		add(new JLabel("Código:"));
-		add(campoCodigo);
-		add(new JLabel("Título:"));
-		add(campoTitulo);
-		add(new JLabel("Autor:"));
-		add(campoAutor);
-		add(new JLabel("Ano:"));
-		add(campoAno);
-		add(new JLabel("Tipo:"));
-		add(comboTipo);
-		add(btnNovo);
-		add(btnSalvar);
-		add(new JLabel());
-		add(btnExcluir);
+        setVisible(true);
+    }
 
-		// Carrega obras
-		carregarObras();
+    private void configurarJanela() {
+        setTitle("Gerenciamento de Obras");
+        setSize(500, 400); // Aumentado para acomodar novo campo
+        setLayout(new GridLayout(10, 2, 10, 5)); // Ajustado para 10 linhas
+        setLocationRelativeTo(null);
+        setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+    }
 
-		// Listeners
-		comboObras.addActionListener(e -> selecionarObra());
-		btnSalvar.addActionListener(this::salvarObra);
-		btnExcluir.addActionListener(this::excluirObra);
-		btnNovo.addActionListener(e -> limparCampos());
+    private void inicializarComponentes() {
+        comboObras = new JComboBox<>();
+        campoCodigo = new JTextField();
+        campoTitulo = new JTextField();
+        campoAutor = new JTextField();
+        campoAno = new JTextField();
+        campoTempoEmprestimo = new JTextField();
+        comboTipo = new JComboBox<>(new String[] { "Livro", "Revista", "Artigo" });
+        btnSalvar = new JButton("Salvar");
+        btnExcluir = new JButton("Excluir");
+        btnLimpar = new JButton("Limpar");
+        btnDebug = new JButton("Debug");
+    }
 
-		setVisible(true);
-	}
+    private void configurarLayout() {
+        add(new JLabel("Obra:"));
+        add(comboObras);
+        add(new JLabel("Código:"));
+        add(campoCodigo);
+        add(new JLabel("Título:"));
+        add(campoTitulo);
+        add(new JLabel("Autor:"));
+        add(campoAutor);
+        add(new JLabel("Ano:"));
+        add(campoAno);
+        add(new JLabel("Tipo:"));
+        add(comboTipo);
+        add(new JLabel("Tempo Empréstimo (dias):"));
+        add(campoTempoEmprestimo);
+        add(btnLimpar);
+        add(btnSalvar);
+        add(btnDebug);
+        add(btnExcluir);
+    }
 
-	private void carregarObras() {
-		comboObras.removeAllItems();
-		List<Obra> obras = ObraDao.carregarTodas();
-		obras.forEach(comboObras::addItem);
-		comboObras.insertItemAt(null, 0);
-		comboObras.setSelectedIndex(0);
-	}
+    private void adicionarListeners() {
+        comboObras.addActionListener(e -> selecionarObra());
+        btnSalvar.addActionListener(this::salvarObra);
+        btnExcluir.addActionListener(this::excluirObra);
+        btnLimpar.addActionListener(e -> limparCampos());
+        btnDebug.addActionListener(e -> debugSistema());
+        
+        // Listener para definir valores padrão conforme o tipo
+        comboTipo.addActionListener(e -> {
+            if (obraSelecionada == null) {
+                String tipo = (String) comboTipo.getSelectedItem();
+                switch(tipo) {
+                    case "Livro":
+                        campoTempoEmprestimo.setText("15");
+                        break;
+                    case "Revista":
+                        campoTempoEmprestimo.setText("7");
+                        break;
+                    case "Artigo":
+                        campoTempoEmprestimo.setText("5");
+                        break;
+                }
+            }
+        });
+    }
 
-	private void selecionarObra() {
-		obraSelecionada = (Obra) comboObras.getSelectedItem();
-		if (obraSelecionada != null) {
-			campoCodigo.setText(String.valueOf(obraSelecionada.getCodigo()));
-			campoTitulo.setText(obraSelecionada.getTitulo());
-			campoAutor.setText(obraSelecionada.getAutor());
-			campoAno.setText(String.valueOf(obraSelecionada.getAnoPublicacao()));
-			comboTipo.setSelectedItem(obraSelecionada.getClass().getSimpleName());
-		}
-	}
+    private void carregarObras() {
+        comboObras.removeAllItems();
+        ObraDao.carregarTodas().forEach(comboObras::addItem);
+        comboObras.insertItemAt(null, 0);
+        comboObras.setSelectedIndex(0);
+    }
 
-	private void salvarObra(ActionEvent e) {
-		try {
-			int codigo = Integer.parseInt(campoCodigo.getText().trim());
-			String titulo = campoTitulo.getText().trim();
-			String autor = campoAutor.getText().trim();
-			int ano = Integer.parseInt(campoAno.getText().trim());
-			String tipo = (String) comboTipo.getSelectedItem();
+    private void selecionarObra() {
+        obraSelecionada = (Obra) comboObras.getSelectedItem();
+        if (obraSelecionada != null) {
+            campoCodigo.setText(String.valueOf(obraSelecionada.getCodigo()));
+            campoTitulo.setText(obraSelecionada.getTitulo());
+            campoAutor.setText(obraSelecionada.getAutor());
+            campoAno.setText(String.valueOf(obraSelecionada.getAnoPublicacao()));
+            campoTempoEmprestimo.setText(String.valueOf(obraSelecionada.getTempoEmprestimo()));
 
-			if (titulo.isEmpty() || autor.isEmpty()) {
-				JOptionPane.showMessageDialog(this, "Preencha todos os campos.");
-				return;
-			}
+            if (obraSelecionada instanceof Livro) {
+                comboTipo.setSelectedItem("Livro");
+            } else if (obraSelecionada instanceof Revista) {
+                comboTipo.setSelectedItem("Revista");
+            } else if (obraSelecionada instanceof Artigo) {
+                comboTipo.setSelectedItem("Artigo");
+            }
+        }
+    }
 
-			List<Obra> obras = ObraDao.carregarTodas();
+    private void salvarObra(ActionEvent e) {
+        try {
+            int codigo = Integer.parseInt(campoCodigo.getText().trim());
+            String titulo = campoTitulo.getText().trim();
+            String autor = campoAutor.getText().trim();
+            int ano = Integer.parseInt(campoAno.getText().trim());
+            String tipo = (String) comboTipo.getSelectedItem();
+            int tempoEmprestimo = Integer.parseInt(campoTempoEmprestimo.getText().trim());
 
-			if (obraSelecionada == null) {
-				// Nova obra
-				if (obras.stream().anyMatch(o -> o.getCodigo() == codigo)) {
-					JOptionPane.showMessageDialog(this, "Já existe uma obra com esse código.");
-					return;
-				}
+            if (titulo.isEmpty() || autor.isEmpty()) {
+                mostrarErro("Preencha todos os campos.");
+                return;
+            }
 
-				Obra nova = switch (tipo) {
-				case "Livro" -> new Livro(codigo, titulo, autor, ano, "Disponível");
-				case "Revista" -> new Revista(codigo, titulo, autor, ano, "Disponível");
-				case "Artigo" -> new Artigo(codigo, titulo, autor, ano, "Disponível");
-				default -> null;
-				};
+            if (tempoEmprestimo <= 0) {
+                mostrarErro("Tempo de empréstimo deve ser maior que zero.");
+                return;
+            }
 
-				if (nova != null) {
-					obras.add(nova);
-					obraSelecionada = nova;
-				}
-			} else {
-				// Edição
-				obraSelecionada.setCodigo(codigo);
-				obraSelecionada.setTitulo(titulo);
-				obraSelecionada.setAutor(autor);
-				obraSelecionada.setAnoPublicacao(ano);
-			}
+            List<Obra> obras = ObraDao.carregarTodas();
+            String status = obraSelecionada != null ? obraSelecionada.getStatus() : "Disponível";
 
-			ObraDao.salvarTodas(obras);
-			atualizarTelasConsulta();
-			JOptionPane.showMessageDialog(this, "Obra salva com sucesso!");
-			carregarObras();
-		} catch (NumberFormatException ex) {
-			JOptionPane.showMessageDialog(this, "Código e Ano devem ser números válidos.");
-		}
-	}
+            if (obraSelecionada == null) {
+                if (obras.stream().anyMatch(o -> o.getCodigo() == codigo)) {
+                    mostrarErro("Já existe uma obra com esse código.");
+                    return;
+                }
+                obras.add(criarObra(codigo, titulo, autor, ano, tipo, status, tempoEmprestimo));
+            } else {
+                obras.replaceAll(o -> o.getCodigo() == codigo
+                        ? criarObra(codigo, titulo, autor, ano, tipo, status, tempoEmprestimo)
+                        : o);
+            }
 
-	private void excluirObra(ActionEvent e) {
-		if (obraSelecionada == null) {
-			JOptionPane.showMessageDialog(this, "Selecione uma obra para excluir.");
-			return;
-		}
+            ObraDao.salvarTodas(obras);
+            mostrarSucesso("Obra salva com sucesso!");
+            carregarObras();
+            limparCampos();
 
-		int confirmacao = JOptionPane.showConfirmDialog(this,
-				"Tem certeza que deseja excluir a obra " + obraSelecionada.getTitulo() + "?", "Confirmar Exclusão",
-				JOptionPane.YES_NO_OPTION);
+        } catch (NumberFormatException ex) {
+            mostrarErro("Código, Ano e Tempo de Empréstimo devem ser números válidos.");
+        }
+    }
 
-		if (confirmacao == JOptionPane.YES_OPTION) {
-			List<Obra> obras = ObraDao.carregarTodas();
-			obras.remove(obraSelecionada);
-			ObraDao.salvarTodas(obras);
-			atualizarTelasConsulta();
-			JOptionPane.showMessageDialog(this, "Obra excluída com sucesso!");
-			limparCampos();
-			carregarObras();
-		}
-	}
+    private Obra criarObra(int codigo, String titulo, String autor, int ano, String tipo, String status,
+            int tempoEmprestimo) {
+        switch (tipo) {
+            case "Livro":
+                return new Livro(codigo, titulo, autor, ano, status, tempoEmprestimo);
+            case "Revista":
+                return new Revista(codigo, titulo, autor, ano, status, tempoEmprestimo);
+            case "Artigo":
+                return new Artigo(codigo, titulo, autor, ano, status, tempoEmprestimo);
+            default:
+                return null;
+        }
+    }
 
-	private void atualizarTelasConsulta() {
-		for (Window window : Window.getWindows()) {
-			if (window instanceof TelaConsultaObras) {
-				((TelaConsultaObras) window).atualizarDados();
-			}
-		}
-	}
+    private void excluirObra(ActionEvent e) {
+        if (obraSelecionada == null) {
+            mostrarErro("Selecione uma obra para excluir.");
+            return;
+        }
 
-	private void limparCampos() {
-		obraSelecionada = null;
-		campoCodigo.setText("");
-		campoTitulo.setText("");
-		campoAutor.setText("");
-		campoAno.setText("");
-		comboTipo.setSelectedIndex(0);
-		comboObras.setSelectedIndex(0);
-	}
+        int confirmacao = JOptionPane.showConfirmDialog(this,
+                "Tem certeza que deseja excluir '" + obraSelecionada.getTitulo() + "'?", "Confirmar Exclusão",
+                JOptionPane.YES_NO_OPTION);
+
+        if (confirmacao == JOptionPane.YES_OPTION) {
+            List<Obra> obras = ObraDao.carregarTodas();
+            obras.removeIf(o -> o.getCodigo() == obraSelecionada.getCodigo());
+            ObraDao.salvarTodas(obras);
+            mostrarSucesso("Obra excluída com sucesso!");
+            limparCampos();
+            carregarObras();
+        }
+    }
+
+    private void limparCampos() {
+        obraSelecionada = null;
+        campoCodigo.setText("");
+        campoTitulo.setText("");
+        campoAutor.setText("");
+        campoAno.setText("");
+        campoTempoEmprestimo.setText("");
+        comboTipo.setSelectedIndex(0);
+        comboObras.setSelectedIndex(0);
+    }
+
+    private void debugSistema() {
+        System.out.println("\n=== DEBUG ===");
+        System.out.println("Obra selecionada: " + (obraSelecionada != null ? obraSelecionada.getTitulo() : "Nenhuma"));
+        System.out.println("Campos:");
+        System.out.println("Código: " + campoCodigo.getText());
+        System.out.println("Título: " + campoTitulo.getText());
+        System.out.println("Autor: " + campoAutor.getText());
+        System.out.println("Ano: " + campoAno.getText());
+        System.out.println("Tempo Empréstimo: " + campoTempoEmprestimo.getText());
+        System.out.println("Tipo: " + comboTipo.getSelectedItem());
+
+        ObraDao.imprimirObras();
+    }
+
+    private void mostrarSucesso(String mensagem) {
+        JOptionPane.showMessageDialog(this, mensagem, "Sucesso", JOptionPane.INFORMATION_MESSAGE);
+    }
+
+    private void mostrarErro(String mensagem) {
+        JOptionPane.showMessageDialog(this, mensagem, "Erro", JOptionPane.ERROR_MESSAGE);
+    }
+
+    public static void main(String[] args) {
+        SwingUtilities.invokeLater(() -> new TelaObra());
+    }
 }

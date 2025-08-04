@@ -7,21 +7,23 @@ public abstract class Obra {
 	protected String Autor;
 	protected int AnoPublicacao;
 	protected String Status;
+	protected int TempoEmprestimo;
 
-// Construtor
-	public Obra(int Codigo, String Titulo, String Autor, int AnoPublicacao, String Status) {
+	// Construtor
+	public Obra(int Codigo, String Titulo, String Autor, int AnoPublicacao, String Status, int TempoEmprestimo) {
 
 		this.Codigo = Codigo;
 		this.Titulo = Titulo;
 		this.Autor = Autor;
 		this.AnoPublicacao = AnoPublicacao;
 		this.Status = Status;
+		this.TempoEmprestimo = TempoEmprestimo;
 	}
 
-// Método tempo de empréstimo
+	// Método tempo de empréstimo
 	public abstract int getTempoEmprestimo();
 
-// Método para visualizar o atributo status
+	// Método para visualizar o atributo status
 	public String getStatus() {
 		return Status;
 	}
@@ -62,4 +64,9 @@ public abstract class Obra {
 	public void setAnoPublicacao(int anoPublicacao) {
 		AnoPublicacao = anoPublicacao;
 	}
+
+	public void setTempoEmprestimo(int tempoEmprestimo) {
+		TempoEmprestimo = tempoEmprestimo;
+	}
+
 }

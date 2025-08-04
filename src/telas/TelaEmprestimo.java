@@ -4,7 +4,9 @@ import javax.swing.*;
 import controle.EmprestimoControle;
 
 public class TelaEmprestimo extends JFrame {
+	
 	public TelaEmprestimo() {
+		
 		setTitle("Empréstimo de Obra");
 		setSize(300, 200);
 		setLayout(null);

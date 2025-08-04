@@ -1,76 +1,143 @@
 package controle;
 
-import java.time.LocalDate;
+import java.time.*;
+import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
+import java.util.ArrayList;
 import java.util.List;
+import javax.swing.JOptionPane;
 import dao.*;
 import modelo.*;
 
 public class EmprestimoControle {
-	private static List<Emprestimo> lista = EmprestimoDao.carregar();
+	private static List<Emprestimo> emprestimosAtivos = new ArrayList<>();
+	private static int ultimoId = 0;
+
+	public static class StatusObra {
+		public static final String DISPONIVEL = "Disponível";
+		public static final String EMPRESTADO = "Emprestado";
+	}
 
 	public static void registrarEmprestimo(String matricula, String codigoStr) throws Exception {
+		try {
+			// Validação dos dados de entrada
+			if (matricula == null || matricula.trim().isEmpty() || codigoStr == null || codigoStr.trim().isEmpty()) {
+				throw new Exception("Matrícula e código da obra são obrigatórios");
+			}
 
-// Converter para int (se necessário)
-		int codigo = Integer.parseInt(codigoStr);
+			// Conversão e busca dos dados
+			int codigo = Integer.parseInt(codigoStr.trim());
+			Usuario usuario = UsuarioDao.buscarPorMatricula(matricula);
+			Obra obra = ObraDao.buscarPorCodigo(codigo);
 
-// Buscar obra
-		Obra obra = ObraDao.buscarPorCodigo(codigo);
-		if (obra == null || !obra.getStatus().equalsIgnoreCase("disponível")) {
-			throw new Exception("Obra não disponível para empréstimo");
+			// Validações de negócio
+			if (usuario == null) {
+				throw new Exception("Usuário não encontrado com a matrícula: " + matricula);
+			}
+
+			if (obra == null) {
+				throw new Exception("Obra não encontrada com o código: " + codigo);
+			}
+
+			if (!obra.getStatus().equalsIgnoreCase(StatusObra.DISPONIVEL)) {
+				throw new Exception("A obra '" + obra.getTitulo() + "' não está disponível para empréstimo");
+			}
+
+			// Verifica se o usuário já tem a obra emprestada
+			if (usuarioPossuiObraEmprestada(usuario, obra)) {
+				throw new Exception("Usuário já possui esta obra emprestada");
+			}
+
+			// Cálculo da data de devolução
+			int diasEmprestimo = obra.getTempoEmprestimo();
+			LocalDate dataEmprestimo = LocalDate.now();
+			LocalDate dataDevolucaoPrevista = dataEmprestimo.plusDays(diasEmprestimo);
+
+			// Criação do empréstimo
+			Emprestimo novoEmprestimo = new Emprestimo(obra, usuario);
+			novoEmprestimo.setId(++ultimoId);
+			novoEmprestimo.setDataEmprestimo(dataEmprestimo);
+
+			// Atualização do status da obra
+			obra.setStatus(StatusObra.EMPRESTADO);
+			ObraDao.atualizarObra(obra);
+
+			// Registro do empréstimo
+			emprestimosAtivos.add(novoEmprestimo);
+
+			// Mensagem de sucesso com detalhes
+			String mensagem = String.format(
+					"Empréstimo registrado com sucesso!\n\n" + "Usuário: %s\n" + "Obra: %s\n" + "Data de devolução: %s",
+					usuario.getNome(), obra.getTitulo(),
+					dataDevolucaoPrevista.format(DateTimeFormatter.ofPattern("dd/MM/yyyy")));
+
+			JOptionPane.showMessageDialog(null, mensagem);
+
+		} catch (NumberFormatException e) {
+			throw new Exception("Código da obra deve ser um número válido");
+		} catch (Exception e) {
+			throw new Exception("Erro ao registrar empréstimo: " + e.getMessage());
 		}
 	}
 
-	private static Usuario buscarUsuario(String matricula) throws Exception {
-		Usuario usuario = UsuarioDao.carregar().stream().filter(u -> u.getMatricula().equalsIgnoreCase(matricula))
-				.findFirst().orElse(null);
-
-		if (usuario == null) {
-			throw new Exception("Usuário não encontrado");
-		}
-		return usuario;
+	private static boolean usuarioPossuiObraEmprestada(Usuario usuario, Obra obra) {
+		return emprestimosAtivos.stream().anyMatch(
+				e -> e.getUsuario().equals(usuario) && e.getObra().equals(obra) && e.getDataDevolucao() == null);
 	}
 
 	public static void registrarDevolucao(String matricula, String codigo) throws Exception {
-		List<Emprestimo> emprestimos = EmprestimoDao.carregar();
-		List<Multa> multas = MultaDao.carregarMultas();
+		try {
+			int codigoObra = Integer.parseInt(codigo.trim());
+			boolean encontrado = false;
 
-		boolean encontrado = false;
+			for (Emprestimo emp : emprestimosAtivos) {
+				boolean usuarioOk = emp.getUsuario().getMatricula().equalsIgnoreCase(matricula.trim());
+				boolean obraOk = emp.getObra().getCodigo() == codigoObra;
+				boolean naoDevolvido = emp.getDataDevolucao() == null;
 
-		for (Emprestimo emp : emprestimos) {
-			boolean usuarioOk = emp.getUsuario().getMatricula().equalsIgnoreCase(matricula);
-			boolean obraOk = emp.getObra().getCodigo() == Integer.parseInt(codigo);
-			boolean naoDevolvido = emp.getDataDevolucao() == null;
+				if (usuarioOk && obraOk && naoDevolvido) {
+					emp.setDataDevolucao(LocalDate.now());
+					emp.getObra().setStatus(StatusObra.DISPONIVEL);
+					ObraDao.atualizarObra(emp.getObra());
 
-			if (usuarioOk && obraOk && naoDevolvido) {
-				emp.setDataDevolucao(LocalDate.now());
+					// Verificar atraso
+					LocalDate dataPrevista = emp.getDataEmprestimo().plusDays(emp.getObra().getTempoEmprestimo());
+					if (LocalDate.now().isAfter(dataPrevista)) {
+						long diasAtraso = ChronoUnit.DAYS.between(dataPrevista, LocalDate.now());
+						double valorMulta = diasAtraso * 1.5; // R$1.50 por dia de atraso
 
-				emp.getObra().setStatus("disponível");
-				atualizarStatusObra(emp.getObra().getCodigo(), "disponível");
+						String multaId = "M" + System.currentTimeMillis();
+						Multa multa = new Multa(multaId, emp, valorMulta, (int) diasAtraso);
+						MultaDao.carregarMultas();
+					}
 
-				if (emp.getDataDevolucao().isBefore(LocalDate.now())) {
-					long diasAtraso = ChronoUnit.DAYS.between(emp.getDataDevolucao(), LocalDate.now());
-					double valorMulta = diasAtraso * 1.5;
-
-					Multa multa = new Multa("1", emp, valorMulta, (int) diasAtraso);
-					multas.add(multa);
-					MultaDao.salvar(multas);
+					encontrado = true;
+					break;
 				}
-
-				EmprestimoDao.salvar(emprestimos);
-				encontrado = true;
-				break;
 			}
-		}
 
-		if (!encontrado) {
-			throw new Exception("Empréstimo não encontrado ou já devolvido.");
+			if (!encontrado) {
+				throw new Exception("Empréstimo não encontrado ou já devolvido");
+			}
+
+		} catch (NumberFormatException e) {
+			throw new Exception("Código da obra inválido. Digite apenas números.");
 		}
 	}
 
-	private static void atualizarStatusObra(int codigo, String status) {
-		List<Obra> obras = ObraDao.carregarTodas();
-		obras.stream().filter(o -> o.getCodigo() == codigo).findFirst().ifPresent(o -> o.setStatus(status));
-		ObraDao.salvarTodas(obras);
+	// Métodos auxiliares para acesso aos empréstimos
+	public static List<Emprestimo> getEmprestimosAtivos() {
+		return new ArrayList<>(emprestimosAtivos);
+	}
+
+	public static List<Emprestimo> getHistoricoCompleto() {
+		// Se quiser manter histórico mesmo após devolução
+		return new ArrayList<>(emprestimosAtivos);
+	}
+
+	public static void limparDados() {
+		// Para testes
+		emprestimosAtivos.clear();
+		ultimoId = 0;
 	}
 }

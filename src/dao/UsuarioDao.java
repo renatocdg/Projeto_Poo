@@ -1,54 +1,36 @@
 package dao;
 
-import java.io.FileReader;
-import java.io.FileWriter;
+import modelo.*;
 import java.util.ArrayList;
 import java.util.List;
-import com.google.gson.Gson;
-import com.google.gson.reflect.TypeToken;
-import modelo.Usuario;
 
 public class UsuarioDao {
-	private static final String ARQUIVO = "usuarios.json";
-	private static final Gson gson = new Gson();
+	private static List<Usuario> usuarios = new ArrayList<>();
+
+	// Dados iniciais de usuários
+	static {
+		usuarios.add(new Usuario("1", "João Silva", TipoUsuario.ALUNO, "joao@email.com", "11987654321"));
+		usuarios.add(new Usuario("2", "Maria Souza", TipoUsuario.PROFESSOR, "maria@email.com", "11912345678"));
+		usuarios.add(new Usuario("3", "Carlos Oliveira", TipoUsuario.SERVIDOR, "carlos@email.com", "11955556666"));
+	}
 
 	public static List<Usuario> carregar() {
-		try {
-			FileReader reader = new FileReader(ARQUIVO);
-			List<Usuario> usuarios = gson.fromJson(reader, new TypeToken<List<Usuario>>() {
-			}.getType());
-			return usuarios != null ? usuarios : new ArrayList<>();
-		} catch (Exception e) {
-			return new ArrayList<>();
-		}
+		return new ArrayList<>(usuarios);
 	}
 
-//MÉTODO PARA ADICIONAR USUÁRIO
-	public static void adicionarUsuario(Usuario novoUsuario) {
-		List<Usuario> usuarios = carregar();
-		usuarios.add(novoUsuario);
-		salvar(usuarios);
-	}
-
-	public static void salvar(List<Usuario> usuarios) {
-		
-		try {
-			FileWriter writer = new FileWriter(ARQUIVO);
-			gson.toJson(usuarios, writer);
-			writer.close();
-		} catch (Exception e) {
-			System.out.println("Erro ao salvar usuários");
-		}
+	public static void salvar(List<Usuario> novaLista) {
+		usuarios = new ArrayList<>(novaLista);
 	}
 
 	public static Usuario buscarPorMatricula(String matricula) {
-		List<Usuario> usuarios = carregar();
+		return usuarios.stream().filter(u -> u.getMatricula().equalsIgnoreCase(matricula.trim())).findFirst()
+				.orElse(null);
+	}
 
-		for (Usuario usuario : usuarios) {
-			if (usuario.getMatricula().equalsIgnoreCase(matricula)) {
-				return usuario;
-			}
-		}
-		return null;
+	// Método para debug
+	public static void imprimirUsuarios() {
+		System.out.println("\n=== LISTA DE USUÁRIOS ===");
+		usuarios.forEach(u -> System.out
+				.println("Matrícula: " + u.getMatricula() + " | Nome: " + u.getNome() + " | Tipo: " + u.getTipo()));
 	}
 }

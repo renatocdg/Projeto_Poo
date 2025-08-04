@@ -52,7 +52,7 @@ public class TelaPagamento extends JFrame {
 
 	private boolean verificarPermissao() {
 		Funcionario logado = FuncionarioDao.funcionarioLogado();
-		if (logado == null || logado.getTipo() == TFuncionario.ESTAGIARIO) {
+		if (logado == null || logado.getTipo() == TipoFuncionario.ESTAGIARIO) {
 			JOptionPane.showMessageDialog(this, "Apenas bibliotecários e administradores podem receber pagamentos.",
 					"Acesso Negado", JOptionPane.WARNING_MESSAGE);
 			dispose();
@@ -107,16 +107,16 @@ public class TelaPagamento extends JFrame {
 			return;
 		}
 
-//Processar pagamento
+		//Processar pagamento
 		Pagamento pagamento = new Pagamento(UUID.randomUUID().toString(), multaSelecionada.getId(),
 				multaSelecionada.getValor(), LocalDate.now(), (MetodoPagamento) comboMetodoPagamento.getSelectedItem(),
 				usuario.getMatricula());
 
-//Atualizar multa
+		//Atualizar multa
 		multaSelecionada.quitar();
 		multaSelecionada.setDataQuitacao(LocalDate.now());
 
-//Salvar alterações
+		//Salvar alterações
 		MultaDao.salvar(multas);
 
 		List<Pagamento> pagamentos = PagamentoDao.carregar();

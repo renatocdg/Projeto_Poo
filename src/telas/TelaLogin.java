@@ -8,7 +8,7 @@ import dao.FuncionarioDao;
 public class TelaLogin extends JFrame {
     private JTextField campoLogin = new JTextField(15);
     private JPasswordField campoSenha = new JPasswordField(15);
-    private JComboBox<TFuncionario> comboTipo = new JComboBox<>(TFuncionario.values());
+    private JComboBox<TipoFuncionario> comboTipo = new JComboBox<>(TipoFuncionario.values());
 
     public TelaLogin() {
         setTitle("Login - Sistema Biblioteca");
@@ -66,7 +66,7 @@ public class TelaLogin extends JFrame {
     private void autenticar() {
         String login = campoLogin.getText();
         String senha = new String(campoSenha.getPassword());
-        TFuncionario tipo = (TFuncionario) comboTipo.getSelectedItem();
+        TipoFuncionario tipo = (TipoFuncionario) comboTipo.getSelectedItem();
 
         Funcionario funcionario = FuncionarioDao.autenticar(login, senha, tipo);
         if (funcionario != null) {

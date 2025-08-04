@@ -3,6 +3,7 @@ package modelo;
 import java.time.LocalDate;
 
 public class Emprestimo {
+	private int id;
 	private Obra obra;
 	private Usuario usuario;
 	private LocalDate dataEmprestimo;
@@ -48,5 +49,13 @@ public class Emprestimo {
 
 	public int getCodigoObra() {
 		return this.obra.getCodigo();
+	}
+
+	public int getId() {
+		return id;
+	}
+
+	public void setId(int id) {
+		this.id = id;
 	}
 }

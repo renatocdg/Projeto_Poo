@@ -5,9 +5,9 @@ public class Funcionario  {
 	private String nome;
 	private String login;
 	private String senha;
-	private TFuncionario tipo;
+	private TipoFuncionario tipo;
 
-	public Funcionario(String nome, String login, String senha, TFuncionario tipo) {
+	public Funcionario(String nome, String login, String senha, TipoFuncionario tipo) {
 		this.nome = nome;
 		this.login = login;
 		this.senha = senha;
@@ -38,11 +38,11 @@ public class Funcionario  {
 		this.senha = senha;
 	}
 
-	public TFuncionario getTipo() {
+	public TipoFuncionario getTipo() {
 		return tipo;
 	}
 
-	public void setTipo(TFuncionario tipo) {
+	public void setTipo(TipoFuncionario tipo) {
 		this.tipo = tipo;
 	}
 

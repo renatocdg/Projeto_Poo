@@ -1,7 +1,7 @@
 package modelo;
 
-public enum TFuncionario {
-
+public enum TipoFuncionario {
+	
 	ADMINISTRADOR, BIBLIOTECARIO, ESTAGIARIO
 
 }

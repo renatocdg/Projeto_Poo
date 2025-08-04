@@ -9,31 +9,42 @@ import java.util.List;
 
 public class TelaUsuario extends JFrame {
 
-	private JTextField campoMatricula, campoNome, campoTelefone, campoEmail;
+	private JTextField campoMatricula, campoNome, campoEmail, campoTelefone;
 	private JComboBox<TipoUsuario> comboTipo;
 	private JComboBox<Usuario> comboUsuarios;
-	private JButton btnSalvar, btnExcluir;
+	private JButton btnSalvar, btnExcluir, btnLimpar;
 	private Usuario usuarioSelecionado;
 
 	public TelaUsuario() {
+		configurarJanela();
+		inicializarComponentes();
+		configurarLayout();
+		carregarUsuarios();
+		adicionarListeners();
+		setVisible(true);
+	}
 
+	private void configurarJanela() {
 		setTitle("Gerenciamento de Usuários");
-		setSize(400, 400);
-		setLayout(new GridLayout(8, 2, 10, 10));
+		setSize(500, 400);
+		setLayout(new GridLayout(7, 2, 10, 10));
 		setLocationRelativeTo(null);
 		setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+	}
 
+	private void inicializarComponentes() {
 		comboUsuarios = new JComboBox<>();
 		campoMatricula = new JTextField();
 		campoNome = new JTextField();
-		comboTipo = new JComboBox<>(TipoUsuario.values());
-		campoTelefone = new JTextField();
 		campoEmail = new JTextField();
+		campoTelefone = new JTextField();
+		comboTipo = new JComboBox<>(TipoUsuario.values());
 		btnSalvar = new JButton("Salvar");
 		btnExcluir = new JButton("Excluir");
-		JButton btnNovo = new JButton("Novo");
+		btnLimpar = new JButton("Limpar");
+	}
 
-		// Layout
+	private void configurarLayout() {
 		add(new JLabel("Usuário:"));
 		add(comboUsuarios);
 		add(new JLabel("Matrícula:"));
@@ -42,31 +53,26 @@ public class TelaUsuario extends JFrame {
 		add(campoNome);
 		add(new JLabel("Tipo:"));
 		add(comboTipo);
-		add(new JLabel("Telefone:"));
-		add(campoTelefone);
 		add(new JLabel("Email:"));
 		add(campoEmail);
-		add(btnNovo);
+		add(new JLabel("Telefone:"));
+		add(campoTelefone);
+		add(btnLimpar);
 		add(btnSalvar);
 		add(new JLabel());
 		add(btnExcluir);
+	}
 
-		// Carrega usuários
-		carregarUsuarios();
-
-		// Listeners
+	private void adicionarListeners() {
 		comboUsuarios.addActionListener(e -> selecionarUsuario());
 		btnSalvar.addActionListener(this::salvarUsuario);
 		btnExcluir.addActionListener(this::excluirUsuario);
-		btnNovo.addActionListener(e -> limparCampos());
-
-		setVisible(true);
+		btnLimpar.addActionListener(e -> limparCampos());
 	}
 
 	private void carregarUsuarios() {
 		comboUsuarios.removeAllItems();
-		List<Usuario> usuarios = UsuarioDao.carregar();
-		usuarios.forEach(comboUsuarios::addItem);
+		UsuarioDao.carregar().forEach(comboUsuarios::addItem);
 		comboUsuarios.insertItemAt(null, 0);
 		comboUsuarios.setSelectedIndex(0);
 	}
@@ -77,8 +83,8 @@ public class TelaUsuario extends JFrame {
 			campoMatricula.setText(usuarioSelecionado.getMatricula());
 			campoNome.setText(usuarioSelecionado.getNome());
 			comboTipo.setSelectedItem(usuarioSelecionado.getTipo());
-			campoTelefone.setText(usuarioSelecionado.getTelefone());
 			campoEmail.setText(usuarioSelecionado.getEmail());
+			campoTelefone.setText(usuarioSelecionado.getTelefone());
 		}
 	}
 
@@ -86,11 +92,16 @@ public class TelaUsuario extends JFrame {
 		String matricula = campoMatricula.getText().trim();
 		String nome = campoNome.getText().trim();
 		TipoUsuario tipo = (TipoUsuario) comboTipo.getSelectedItem();
-		String telefone = campoTelefone.getText().trim();
 		String email = campoEmail.getText().trim();
+		String telefone = campoTelefone.getText().trim();
 
-		if (matricula.isEmpty() || nome.isEmpty()) {
-			JOptionPane.showMessageDialog(this, "Matrícula e nome são obrigatórios.");
+		if (matricula.isEmpty() || nome.isEmpty() || email.isEmpty() || telefone.isEmpty()) {
+			JOptionPane.showMessageDialog(this, "Preencha todos os campos obrigatórios.");
+			return;
+		}
+
+		if (!email.contains("@")) {
+			JOptionPane.showMessageDialog(this, "Email inválido.");
 			return;
 		}
 
@@ -98,25 +109,24 @@ public class TelaUsuario extends JFrame {
 
 		if (usuarioSelecionado == null) {
 			// Novo usuário
-			boolean matriculaJaExiste = usuarios.stream().anyMatch(u -> u.getMatricula().equalsIgnoreCase(matricula));
-			if (matriculaJaExiste) {
+			if (UsuarioDao.buscarPorMatricula(matricula) != null) {
 				JOptionPane.showMessageDialog(this, "Matrícula já cadastrada.");
 				return;
 			}
-			usuarioSelecionado = new Usuario(matricula, nome, tipo, telefone, email);
-			usuarios.add(usuarioSelecionado);
+			usuarios.add(new Usuario(matricula, nome, tipo, email, telefone));
 		} else {
 			// Edição
 			usuarioSelecionado.setMatricula(matricula);
 			usuarioSelecionado.setNome(nome);
 			usuarioSelecionado.setTipo(tipo);
-			usuarioSelecionado.setTelefone(telefone);
 			usuarioSelecionado.setEmail(email);
+			usuarioSelecionado.setTelefone(telefone);
 		}
 
 		UsuarioDao.salvar(usuarios);
 		JOptionPane.showMessageDialog(this, "Usuário salvo com sucesso!");
 		carregarUsuarios();
+		limparCampos();
 	}
 
 	private void excluirUsuario(ActionEvent e) {
@@ -126,12 +136,12 @@ public class TelaUsuario extends JFrame {
 		}
 
 		int confirmacao = JOptionPane.showConfirmDialog(this,
-				"Tem certeza que deseja excluir o usuário " + usuarioSelecionado.getNome() + "?", "Confirmar Exclusão",
+				"Tem certeza que deseja excluir " + usuarioSelecionado.getNome() + "?", "Confirmar Exclusão",
 				JOptionPane.YES_NO_OPTION);
 
 		if (confirmacao == JOptionPane.YES_OPTION) {
 			List<Usuario> usuarios = UsuarioDao.carregar();
-			usuarios.remove(usuarioSelecionado);
+			usuarios.removeIf(u -> u.getMatricula().equals(usuarioSelecionado.getMatricula()));
 			UsuarioDao.salvar(usuarios);
 			JOptionPane.showMessageDialog(this, "Usuário excluído com sucesso!");
 			limparCampos();
@@ -144,8 +154,12 @@ public class TelaUsuario extends JFrame {
 		campoMatricula.setText("");
 		campoNome.setText("");
 		comboTipo.setSelectedIndex(0);
-		campoTelefone.setText("");
 		campoEmail.setText("");
+		campoTelefone.setText("");
 		comboUsuarios.setSelectedIndex(0);
+	}
+
+	public static void main(String[] args) {
+		SwingUtilities.invokeLater(() -> new TelaUsuario());
 	}
 }
