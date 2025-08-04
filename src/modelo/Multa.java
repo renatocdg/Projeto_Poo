@@ -4,12 +4,12 @@ import java.time.LocalDate;
 
 public class Multa {
 	private LocalDate dataQuitacao;
-	private final String id;
-	private final Emprestimo emprestimo;
-	private final double valor;
-	private final int diasAtraso;
+	private String id;
+	private Emprestimo emprestimo;
+	private double valor;
+	private int diasAtraso;
 	private boolean quitada;
-	private final LocalDate dataGeracao;
+	private LocalDate dataGeracao;
 
 	public Multa(String id, Emprestimo emprestimo, double valor, int diasAtraso) {
 		this.id = id;

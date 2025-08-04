@@ -2,12 +2,13 @@ package telas;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
-import modelo.Obra;
-import dao.ObraDao;
+import modelo.*;
+import dao.*;
 import java.awt.*;
 import java.util.List;
 
 public class TelaConsultaObras extends JFrame {
+	
     private DefaultTableModel modeloTabela;
     private JTable tabela;
 
@@ -54,7 +55,7 @@ public class TelaConsultaObras extends JFrame {
 
         if (obras != null) {
             for (Obra obra : obras) {
-                if (obra != null) {  // Verificação importante para evitar NPE
+                if (obra != null) {
                     modeloTabela.addRow(new Object[]{
                         obra.getCodigo(),
                         obra.getTitulo(),
