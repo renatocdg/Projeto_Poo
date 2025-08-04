@@ -107,16 +107,16 @@ public class TelaPagamento extends JFrame {
 			return;
 		}
 
-		//Processar pagamento
+		// Processar pagamento
 		Pagamento pagamento = new Pagamento(UUID.randomUUID().toString(), multaSelecionada.getId(),
 				multaSelecionada.getValor(), LocalDate.now(), (MetodoPagamento) comboMetodoPagamento.getSelectedItem(),
 				usuario.getMatricula());
 
-		//Atualizar multa
+		// Atualizar multa
 		multaSelecionada.quitar();
 		multaSelecionada.setDataQuitacao(LocalDate.now());
 
-		//Salvar alterações
+		// Salvar alterações
 		MultaDao.salvar(multas);
 
 		List<Pagamento> pagamentos = PagamentoDao.carregar();

@@ -10,6 +10,7 @@ import modelo.Multa;
 
 public class MultaDao {
 	private static final String ARQUIVO = "multas.json";
+	
 	private static final Gson gson = new Gson();
 
 	public static List<Multa> carregarMultas() {

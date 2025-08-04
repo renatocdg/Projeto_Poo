@@ -8,6 +8,7 @@ public class UsuarioDao {
 	private static List<Usuario> usuarios = new ArrayList<>();
 
 	// Dados iniciais de usuários
+
 	static {
 		usuarios.add(new Usuario("1", "João Silva", TipoUsuario.ALUNO, "joao@email.com", "11987654321"));
 		usuarios.add(new Usuario("2", "Maria Souza", TipoUsuario.PROFESSOR, "maria@email.com", "11912345678"));
@@ -29,7 +30,7 @@ public class UsuarioDao {
 
 	// Método para debug
 	public static void imprimirUsuarios() {
-		System.out.println("\n=== LISTA DE USUÁRIOS ===");
+		System.out.println("LISTA DE USUÁRIOS");
 		usuarios.forEach(u -> System.out
 				.println("Matrícula: " + u.getMatricula() + " | Nome: " + u.getNome() + " | Tipo: " + u.getTipo()));
 	}

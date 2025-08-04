@@ -8,68 +8,61 @@ import java.awt.*;
 import java.util.List;
 
 public class TelaConsultaObras extends JFrame {
-	
-    private DefaultTableModel modeloTabela;
-    private JTable tabela;
 
-    public TelaConsultaObras() {
-        configurarJanela();
-        criarComponentes();
-        carregarTodas();
-        setVisible(true);
-    }
+	private DefaultTableModel modeloTabela;
+	private JTable tabela;
 
-    private void configurarJanela() {
-        setTitle("Consulta de Obras");
-        setSize(800, 500);
-        setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-        setLocationRelativeTo(null);
-    }
+	public TelaConsultaObras() {
+		configurarJanela();
+		criarComponentes();
+		carregarTodas();
+		setVisible(true);
+	}
 
-    private void criarComponentes() {
-        modeloTabela = new DefaultTableModel(
-            new Object[]{"Código", "Título", "Autor", "Ano", "Tipo", "Status"}, 0) {
-            @Override
-            public boolean isCellEditable(int row, int column) {
-                return false;
-            }
-        };
+	private void configurarJanela() {
+		setTitle("Consulta de Obras");
+		setSize(800, 500);
+		setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+		setLocationRelativeTo(null);
+	}
 
-        tabela = new JTable(modeloTabela);
-        tabela.setAutoCreateRowSorter(true);
+	private void criarComponentes() {
+		modeloTabela = new DefaultTableModel(new Object[] { "Código", "Título", "Autor", "Ano", "Tipo", "Status" }, 0) {
+			@Override
+			public boolean isCellEditable(int row, int column) {
+				return false;
+			}
+		};
 
-        JScrollPane scrollPane = new JScrollPane(tabela);
-        add(scrollPane, BorderLayout.CENTER);
+		tabela = new JTable(modeloTabela);
+		tabela.setAutoCreateRowSorter(true);
 
-        JButton btnAtualizar = new JButton("Atualizar");
-        btnAtualizar.addActionListener(e -> carregarTodas());
+		JScrollPane scrollPane = new JScrollPane(tabela);
+		add(scrollPane, BorderLayout.CENTER);
 
-        JPanel painelBotoes = new JPanel();
-        painelBotoes.add(btnAtualizar);
-        add(painelBotoes, BorderLayout.SOUTH);
-    }
+		JButton btnAtualizar = new JButton("Atualizar");
+		btnAtualizar.addActionListener(e -> carregarTodas());
 
-    public void carregarTodas() {
-        modeloTabela.setRowCount(0); // Limpa a tabela
-        List<Obra> obras = ObraDao.carregarTodas();
+		JPanel painelBotoes = new JPanel();
+		painelBotoes.add(btnAtualizar);
+		add(painelBotoes, BorderLayout.SOUTH);
+	}
 
-        if (obras != null) {
-            for (Obra obra : obras) {
-                if (obra != null) {
-                    modeloTabela.addRow(new Object[]{
-                        obra.getCodigo(),
-                        obra.getTitulo(),
-                        obra.getAutor(),
-                        obra.getAnoPublicacao(),
-                        obra.getClass().getSimpleName(),
-                        obra.getStatus()
-                    });
-                }
-            }
-        }
-    }
-    
-    public void atualizarDados() {
-        carregarTodas(); 
-    }
+	public void carregarTodas() {
+		modeloTabela.setRowCount(0); // Limpa a tabela
+		List<Obra> obras = ObraDao.carregarTodas();
+
+		if (obras != null) {
+			for (Obra obra : obras) {
+				if (obra != null) {
+					modeloTabela.addRow(new Object[] { obra.getCodigo(), obra.getTitulo(), obra.getAutor(),
+							obra.getAnoPublicacao(), obra.getClass().getSimpleName(), obra.getStatus() });
+				}
+			}
+		}
+	}
+
+	public void atualizarDados() {
+		carregarTodas();
+	}
 }

@@ -7,7 +7,7 @@ import dao.*;
 
 public class ControleUsuario {
 
-//CLASSES DE EXCEÇÃO
+	//Classes de exceção
 	public static class UsuarioJaCadastradoException extends Exception {
 		public UsuarioJaCadastradoException(String matricula) {
 			super("Já existe um usuário cadastrado com a matrícula: " + matricula);
@@ -28,12 +28,12 @@ public class ControleUsuario {
 
 	private List<Usuario> listaUsuarios;
 
-//CONSTRUTOR
+	//Construtor
 	public ControleUsuario() {
 		this.listaUsuarios = UsuarioDao.carregar();
 	}
 
-//MÉTODOS PRINCIPAIS
+	//Métodos principais
 	public void cadastrarUsuario(Usuario usuario) throws UsuarioJaCadastradoException, DadosInvalidosException {
 
 		validarDadosUsuario(usuario);
@@ -77,7 +77,7 @@ public class ControleUsuario {
 		UsuarioDao.salvar(listaUsuarios);
 	}
 
-//MÉTODOS DE CONSULTA
+	//Métodos de consulta
 	public Usuario buscarPorMatricula(String matricula) {
 		return listaUsuarios.stream().filter(u -> u.getMatricula().equalsIgnoreCase(matricula)).findFirst()
 				.orElse(null);
@@ -87,7 +87,7 @@ public class ControleUsuario {
 		return new ArrayList<>(listaUsuarios); // Retorna cópia para evitar modificações externas
 	}
 
-//MÉTODOS AUXILIARES
+	//Métodos auxiliares
 	private void validarDadosUsuario(Usuario usuario) throws DadosInvalidosException {
 		if (usuario.getMatricula() == null || usuario.getMatricula().trim().isEmpty()) {
 			throw new DadosInvalidosException("Matrícula não pode ser vazia");

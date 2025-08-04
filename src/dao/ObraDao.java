@@ -12,7 +12,8 @@ public class ObraDao {
 	// Dados iniciais
 	static {
 		obras.add(new Livro(1, "Dom Casmurro", "Machado de Assis", 1899, "Disponível", 15));
-		obras.add(new Revista(2, "Ciência Hoje", "Sociedade Brasileira para o Progresso da Ciência", 2023, "Disponível",7));
+		obras.add(new Revista(2, "Ciência Hoje", "Sociedade Brasileira para o Progresso da Ciência", 2023, "Disponível",
+				7));
 		obras.add(new Artigo(3, "Padrões de Design", "Erich Gamma", 1994, "Disponível", 5));
 	}
 
