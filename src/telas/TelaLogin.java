@@ -17,7 +17,7 @@ public class TelaLogin extends JFrame {
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLocationRelativeTo(null);
         
-        // Painel principal com borda e padding
+        // Painel principal
         JPanel painelPrincipal = new JPanel();
         painelPrincipal.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
         painelPrincipal.setLayout(new BoxLayout(painelPrincipal, BoxLayout.Y_AXIS));

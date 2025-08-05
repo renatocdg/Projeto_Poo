@@ -81,13 +81,13 @@ public class TelaObra extends JFrame {
 				String tipo = (String) comboTipo.getSelectedItem();
 				switch (tipo) {
 				case "Livro":
-					campoTempoEmprestimo.setText("15");
-					break;
-				case "Revista":
 					campoTempoEmprestimo.setText("7");
 					break;
+				case "Revista":
+					campoTempoEmprestimo.setText("3");
+					break;
 				case "Artigo":
-					campoTempoEmprestimo.setText("5");
+					campoTempoEmprestimo.setText("2");
 					break;
 				}
 			}

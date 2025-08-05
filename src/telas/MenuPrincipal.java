@@ -58,8 +58,6 @@ public class MenuPrincipal extends JFrame {
 			adicionarBotaoMenu(painelBotoes, "Pagamento de Multas", () -> new TelaPagamento());
 			adicionarBotaoMenu(painelBotoes, "Gerar Relatórios", this::exibirMenuRelatorios);
 		} else if (funcionario.getTipo() == TipoFuncionario.BIBLIOTECARIO) {
-			adicionarBotaoMenu(painelBotoes, "Cadastrar Usuário", () -> new TelaUsuario());
-			adicionarBotaoMenu(painelBotoes, "Cadastrar Obra", () -> new TelaObra());
 			adicionarBotaoMenu(painelBotoes, "Registrar Empréstimo", () -> new TelaEmprestimo());
 			adicionarBotaoMenu(painelBotoes, "Registrar Devolução", () -> new TelaDevolucao());
 			adicionarBotaoMenu(painelBotoes, "Pagamento de Multas", () -> new TelaPagamento());
